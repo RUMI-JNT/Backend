@@ -1,4 +1,5 @@
 const express = require('express');
+const helpers = require('./helpers.js');
 
 const router = express.Router();
 
@@ -23,6 +24,9 @@ router.post('/v1/signup', async (req, res) => {
         email,
         number
     });
+    await helpers.signUpEmail(email, res);
+    console.log(user);
+    console.log(signUpEmail);
     res.status(200).end(`${user.dataValues.id}`);
   } catch (error) {
     return res.status(400).send(error);
@@ -63,6 +67,8 @@ router.post('/v1/createitem', async (req, res) => {
   const times = req.body.times;
   const requester = req.body.requester;
   const acceptor = req.body.acceptor;
+  const sendBy = req.body.sendBy;
+  const sendInfo = req.body.sendInfo;
   
   try {
     let item = await Item.create({
@@ -73,12 +79,21 @@ router.post('/v1/createitem', async (req, res) => {
     });
     if(item) {
       const item_id = item.dataValues.id;
+      const email = item.dataValues.email;
+      const phone = item.dataValues.phone;
+      
       try {
         let userItem = await UserItem.create({
           requester_id: requester,
           acceptor_id: acceptor,
           item_id
         })
+        // if (sendBy === 'email') {
+        //   await helpers.sendEmail(sendInfo, res);
+        // } else {
+        //   console.log('inside else')
+        //   await helpers.sendText(sendInfo, res);
+        // }
         res.status(200).end('item saved');
       } catch (err) {
         return res.status(400).send(err);
@@ -88,4 +103,27 @@ router.post('/v1/createitem', async (req, res) => {
     return res.status(400).send(error);
   }
 })
+
+router.get('/v1/useritems/*', async (req, res) => {
+  const userId = req.params[0];
+
+  try {
+    let userItems = await UserItem.findAll({ 
+      where: {
+        requester_id: userId
+      } 
+    })
+      .then((items) => {
+        let itemsArr = Promise.all(items.map(async (item) => {
+          let holder = await Item.findById(item.id);
+          return holder.dataValues;
+        })).then( results => {
+          res.status(200).send(JSON.stringify(results))
+        })
+      })
+  } catch (error) {
+    res.status(400).end(error);
+  }
+})
+
 module.exports = router;
