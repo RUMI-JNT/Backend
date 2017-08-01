@@ -1,15 +1,15 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../../server').connection;
 
-const UserItem = sequelize.define('item', {
+const UserItem = sequelize.define('users_items', {
   requester_id: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING,
   },
   acceptor_id: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING,
   },
   item_id: {
-    type: Sequelize.INTEGER
+    type: Sequelize.STRING
   }
 });
 
