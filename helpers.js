@@ -19,11 +19,19 @@ module.exports = {
     var mailOptions = {
       from: process.env.RUMI_EMAIL,
       to: email,
-      subject: 'Sending Email using Node.js',
-      text: 'That was easy!'
-    };
+      subject: 'Welcome to Rūmi!',
+      text: `Thank you for joining RUMI app that lets you minimize confusion and conflicts over resources one share at a time.
 
-    transporter.sendMail(mailOptions, async (err, info) => {
+      To get started simply navigate to the Share Screen (hyperlink this to that screen), enter your item, description and desired recipient’s information.
+
+      Then select the timeframe for which you want to share your item.
+
+      Then submit!`
+
+    };
+    
+
+        transporter.sendMail(mailOptions, async (err, info) => {
       if (err) {
         res.status(400).end(err);
       } else {
@@ -47,7 +55,7 @@ module.exports = {
     });
   },
   sendEmail: async (info, res) => {
-    console.log(info)
+    console.log(info, 'dsaxs')
     
     let transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -61,10 +69,7 @@ module.exports = {
       from: process.env.RUMI_EMAIL,
       to: info.email,
       subject: 'Rūmi Item Creation',
-      text: {
-        image: info.image, 
-        message: info.message
-      }
+      text: `Hey, ${info.user} created a rumi to ${info.message}, check it out!`
     };
 
     let result = await transporter.sendMail(mailOptions, async (err, info) => {
